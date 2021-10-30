@@ -14,15 +14,26 @@ LR = 0.001
 class Agent:
 
     def __init__(self):
-        self.n_games = 0
-        self.epsilon = 0 # randomness
-        self.gamma = 0.9 # discount rate
-        self.memory = deque(maxlen=MAX_MEMORY) # popleft()
-        self.model = Linear_QNet(11, 256, 3)
+        self.n_games = 0 #number of games played
+        self.epsilon = 0 #randomness
+        self.gamma = 0.9 #discount rate
+        self.memory = deque(maxlen=MAX_MEMORY) #if exceeded popleft()
+        self.model = Linear_QNet(11, 256, 3) #deep learning model
         self.trainer = QTrainer(self.model, lr=LR, gamma=self.gamma)
 
 
     def get_state(self, game):
+        """Get the current state of the snake from snake_pygame
+
+        Args:
+            game: SnakeGameAI class
+
+        Returns:
+            numpy array of binary values (11 values):
+            [danger straight, danger right, danger left,
+            direction left, direction right, direction up, direction down,
+            food left, food right, food up, food down]
+        """
         head = game.snake[0]
         point_l = Point(head.x - 20, head.y)
         point_r = Point(head.x + 20, head.y)
@@ -35,40 +46,43 @@ class Agent:
         dir_d = game.direction == Direction.DOWN
 
         state = [
-            # Danger straight
+            #Danger straight
             (dir_r and game.is_collision(point_r)) or 
             (dir_l and game.is_collision(point_l)) or 
             (dir_u and game.is_collision(point_u)) or 
             (dir_d and game.is_collision(point_d)),
 
-            # Danger right
+            #Danger right
             (dir_u and game.is_collision(point_r)) or 
             (dir_d and game.is_collision(point_l)) or 
             (dir_l and game.is_collision(point_u)) or 
             (dir_r and game.is_collision(point_d)),
 
-            # Danger left
+            #Danger left
             (dir_d and game.is_collision(point_r)) or 
             (dir_u and game.is_collision(point_l)) or 
             (dir_r and game.is_collision(point_u)) or 
             (dir_l and game.is_collision(point_d)),
             
-            # Move direction
+            #Move direction
             dir_l,
             dir_r,
             dir_u,
             dir_d,
             
-            # Food location 
-            game.food.x < game.head.x,  # food left
-            game.food.x > game.head.x,  # food right
-            game.food.y < game.head.y,  # food up
-            game.food.y > game.head.y  # food down
+            #Food location 
+            game.food.x < game.head.x,  #food left
+            game.food.x > game.head.x,  #food right
+            game.food.y < game.head.y,  #food up
+            game.food.y > game.head.y  #food down
             ]
 
         return np.array(state, dtype=int)
 
     def remember(self, state, action, reward, next_state, done):
+        """Remeber the args for learning model
+        store as 1 tuple
+        """
         self.memory.append((state, action, reward, next_state, done)) # popleft if MAX_MEMORY is reached
 
     def train_long_memory(self):
@@ -79,17 +93,29 @@ class Agent:
 
         states, actions, rewards, next_states, dones = zip(*mini_sample)
         self.trainer.train_step(states, actions, rewards, next_states, dones)
-        #for state, action, reward, nexrt_state, done in mini_sample:
-        #    self.trainer.train_step(state, action, reward, next_state, done)
+        for state, action, reward, next_state, done in mini_sample:
+            self.trainer.train_step(state, action, reward, next_state, done)
 
     def train_short_memory(self, state, action, reward, next_state, done):
+        """Remeber one game step
+        Store batch for use in long memory
+        """
         self.trainer.train_step(state, action, reward, next_state, done)
 
     def get_action(self, state):
-        # random moves: tradeoff exploration / exploitation
-        self.epsilon = 80 - self.n_games
+        """Get action based on state
+
+        Args:
+            state (function): current state
+
+        Returns:
+            action: final move based on model
+        """
+        #random moves: tradeoff exploration / exploitation
+        self.epsilon = 100 - self.n_games
         final_move = [0,0,0]
         if random.randint(0, 200) < self.epsilon:
+            #After 100 games the moves will no longer be random
             move = random.randint(0, 2)
             final_move[move] = 1
         else:
@@ -102,6 +128,11 @@ class Agent:
 
 
 def train():
+    """
+    Train snake to improve at snake game
+    Game shown in pygame
+    Progess ploted via matplotlib
+    """
     plot_scores = []
     plot_mean_scores = []
     total_score = 0
@@ -109,20 +140,20 @@ def train():
     agent = Agent()
     game = SnakeGameAI()
     while True:
-        # get old state
+        #get old state
         state_old = agent.get_state(game)
 
-        # get move
+        #get move
         final_move = agent.get_action(state_old)
 
-        # perform move and get new state
+        #perform move and get new state
         reward, done, score = game.play_step(final_move)
         state_new = agent.get_state(game)
 
-        # train short memory
+        #train short memory
         agent.train_short_memory(state_old, final_move, reward, state_new, done)
 
-        # remember
+        #remember
         agent.remember(state_old, final_move, reward, state_new, done)
 
         if done:

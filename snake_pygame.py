@@ -32,11 +32,8 @@ class SnakeGameAI:
     def __init__(self, w=640, h=480):
         #width and height of gui
         self.w = w
-        w = 640
         self.h = h
-        h = 480
         self.display = pygame.display.set_mode((self.w, self.h))
-        #self.display = pygame.display.set_mode(self.w, self.h)
         pygame.display.set_caption('Snake AI')
         self.clock = pygame.time.Clock()
         self.reset()
