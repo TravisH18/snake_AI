@@ -5,6 +5,8 @@ import numpy as np
 import pygame
 
 pygame.init()
+arial = pygame.font.Font(pygame.font.match_font('arial'), 14)
+font = arial
 #font = pygame.font.Font('arial.ttf', 25)
 
 class Direction(Enum):
@@ -18,8 +20,8 @@ Point = namedtuple ('Point', 'x, y')
 #rgb colors
 WHITE = (255, 255, 255)
 RED = (200,0,0)
-BLUE1 = (0, 0, 255)
-BLUE2 = (0, 100, 255)
+GREEN1 = (0, 255, 0)
+GREEN2 = (0, 255, 100)
 BLACK = (0,0,0)
 
 BLOCK_SIZE = 20
@@ -30,8 +32,11 @@ class SnakeGameAI:
     def __init__(self, w=640, h=480):
         #width and height of gui
         self.w = w
+        w = 640
         self.h = h
-        self.display = pygame.display.set_mode(self.w, self.h)
+        h = 480
+        self.display = pygame.display.set_mode((self.w, self.h))
+        #self.display = pygame.display.set_mode(self.w, self.h)
         pygame.display.set_caption('Snake AI')
         self.clock = pygame.time.Clock()
         self.reset()
@@ -46,13 +51,15 @@ class SnakeGameAI:
             Point(self.head.x-(2*BLOCK_SIZE), self.head.y)
             ]
         self.score = 0
-        self.food = None
+        #self.food = None
+        #self.food = Point(x,y)
         self._place_food()
         self.frame_iteration = 0
 
     def _place_food(self):
         x = random.randint(0, (self.w-BLOCK_SIZE) //BLOCK_SIZE)*BLOCK_SIZE
         y = random.randint(0, (self.h-BLOCK_SIZE) //BLOCK_SIZE)*BLOCK_SIZE
+        self.food = Point(x,y)
 
     def play_step(self, action):
         self.frame_iteration += 1
@@ -106,12 +113,12 @@ class SnakeGameAI:
         self.display.fill(BLACK)
 
         for pt in self.snake:
-            pygame.draw.rect(self.display, BLUE1, pygame.Rect(pt.x, pt.y, BLOCK_SIZE, BLOCK_SIZE))
-            pygame.draw.rect(self.display, BLUE2, pygame.Rect(pt.x+4, pt.y+4, 12, 12))
+            pygame.draw.rect(self.display, GREEN1, pygame.Rect(pt.x, pt.y, BLOCK_SIZE, BLOCK_SIZE))
+            pygame.draw.rect(self.display, GREEN2, pygame.Rect(pt.x+4, pt.y+4, 12, 12))
 
         pygame.draw.rect(self.display, RED, pygame.Rect(self.food.x, self.food.y, BLOCK_SIZE, BLOCK_SIZE))
 
-        text = pygame.render("Score: " + str(self.score), True, WHITE)
+        text = font.render("Score: " + str(self.score), True, WHITE)
         self.display.blit(text, [0, 0])
         pygame.display.flip()
 
