@@ -9,7 +9,7 @@ Made using pygame module
 -play_step(action)
 --returns reward, done(game_over bool), score
 
-##Model
+## Model
 
 Made with PyTorch
 
@@ -17,11 +17,11 @@ Linear_QNet (DQN) uses a feed foreward neural network with one hidden layer size
 -model.predict(state)
 ->returns action based on maximized cumulative reward
 
-##Agent
+## Agent
 
-####Main file
+#### Main file
 
-######Training method:
+###### Training method:
 
 -state = get_state(from game)
 -action = get_move(based on state of game environment):
@@ -33,7 +33,7 @@ Linear_QNet (DQN) uses a feed foreward neural network with one hidden layer size
  add single move to short term memory
  once game_over = True add batch of short term memories to long term memory
  
- ######model.train()
+ ###### model.train()
  
  Uses optimizer.Adam() method an algorithm for first-order gradient-based optimization of stochastic objective functions, based on adaptive estimates of lower-order moments.
  
