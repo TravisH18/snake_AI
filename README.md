@@ -42,13 +42,19 @@ Q Value = Quality of action
  ###### model.train()
  
 How new Q-Value is calculated
+
 s = state
+
 a = action
+
 lr = learning rate
+
 gamma = discount rate
+
 R = reward
 
 ** Function **
+
 NewQ(s,a) = Q(s,a) + lr[R(s,a) + gamma*maxQ'(s',a') - Q(s,a)
 
 Uses optimizer.Adam() method an algorithm for first-order gradient-based optimization of stochastic objective functions, based on adaptive estimates of lower-order moments.
