@@ -13,9 +13,15 @@ Made using pygame module
 
 Made with PyTorch
 
-Linear_QNet (DQN) uses a feed foreward neural network with one hidden layer size 256 and a Relu activation function
--model.predict(state)
-->returns action based on maximized cumulative reward
+Linear_QNet (DQN) uses a feed foreward neural network with one hidden layer size 256 and a Relu activation function.
+
+Q Value = Quality of action
+1. Init Q Value (= init model)
+2. Choose action (model.predict) ->returns action based on maximized cumulative reward
+3. Perform action
+4. Measure Reward
+5. Update Q value (+train model)
+6. Repeat
 
 ## Agent
 
@@ -35,6 +41,16 @@ Linear_QNet (DQN) uses a feed foreward neural network with one hidden layer size
  
  ###### model.train()
  
- Uses optimizer.Adam() method an algorithm for first-order gradient-based optimization of stochastic objective functions, based on adaptive estimates of lower-order moments.
+How new Q-Value is calculated
+s = state
+a = action
+lr = learning rate
+gamma = discount rate
+R = reward
+
+** Function **
+NewQ(s,a) = Q(s,a) + lr[R(s,a) + gamma*maxQ'(s',a') - Q(s,a)
+
+Uses optimizer.Adam() method an algorithm for first-order gradient-based optimization of stochastic objective functions, based on adaptive estimates of lower-order moments.
  
- Criterion of the Mean Squared error is pair with the built in backwards() method to complete the training process.
+Criterion of the Mean Squared error is pair with the built in backwards() method to complete the training process.
